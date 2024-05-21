@@ -19,6 +19,16 @@ pipeline {
                     echo 'Tools: JUnit, TestNG'
                 }
             }
+            post {
+                always {
+                    emailext (
+                        to: 'rathishivang5556@gmail.com',
+                        subject: "Unit and Integration Tests Stage: ${currentBuild.fullDisplayName}",
+                        body: "The Unit and Integration Tests stage has completed with status: ${currentBuild.currentResult}.",
+                        attachmentsPattern: '**/target/*.log'
+                    )
+                }
+            }
         }
         stage('Code Analysis') {
             steps {
@@ -35,6 +45,16 @@ pipeline {
                     echo 'Performing Security Scan...'
                     // Specify security scan tool, e.g., OWASP Dependency Check
                     echo 'Tool: OWASP Dependency Check'
+                }
+            }
+            post {
+                always {
+                    emailext (
+                        to: 'rathishivang5556@gmail.com',
+                        subject: "Security Scan Stage: ${currentBuild.fullDisplayName}",
+                        body: "The Security Scan stage has completed with status: ${currentBuild.currentResult}.",
+                        attachmentsPattern: '**/target/*.log'
+                    )
                 }
             }
         }
@@ -70,12 +90,12 @@ pipeline {
     post {
         always {
             script {
-                echo 'Sending Notification Emails...'
-                // Configure email notification
+                echo 'Sending Final Notification Email...'
+                // Final email notification for overall pipeline result
                 emailext (
-                    subject: "Pipeline ${currentBuild.fullDisplayName}",
-                    body: "Pipeline ${currentBuild.fullDisplayName} finished with status: ${currentBuild.currentResult}",
-                    recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                    to: 'rathishivang5556@gmail.com',
+                    subject: "Pipeline ${currentBuild.fullDisplayName} - ${currentBuild.currentResult}",
+                    body: "Pipeline ${currentBuild.fullDisplayName} finished with status: ${currentBuild.currentResult}.",
                     attachmentsPattern: '**/target/*.log'
                 )
             }
